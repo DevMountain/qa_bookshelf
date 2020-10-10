@@ -45,7 +45,7 @@ class App extends React.Component {
   //Look at this - is this right?
   addBook = (e, title, author, genre, coverImg) => {
     e.preventDefault();
-    this.updateBookshelf(addBook(title, author, genre, coverImg));
+    this.updateBookshelf(addBook({ title, author, genre, coverImg }));
   };
 
   getGenre = (genre) => {
@@ -61,7 +61,6 @@ class App extends React.Component {
   };
 
   render() {
-    console.log(this.state);
     return (
       <div className='App'>
         <div className='page'>
