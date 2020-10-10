@@ -1,101 +1,86 @@
-import React from 'react';
-import axios from 'axios';
-import './reset.css';
-import './App.css';
-import Header from './Components/Header';
-import AddBook from './Components/AddBook';
-import Bookshelf from './Components/Bookshelf';
-import GenreSelector from './Components/GenreSelector'
+import React from "react";
+import "./reset.css";
+import "./App.css";
+import Header from "./Components/Header";
+import AddBook from "./Components/AddBook";
+import Bookshelf from "./Components/Bookshelf";
+import GenreSelector from "./Components/GenreSelector";
+import {
+  addBook,
+  deleteBook,
+  getBooks,
+  getGenre,
+  toggleComplete,
+} from "./Components/Booklist";
 class App extends React.Component {
   constructor() {
     super();
-    this.state  = {
-      books: [] 
-    }
-    this.getBooks = this.getBooks.bind(this)
-    this.getGenre = this.getGenre.bind(this)
-    this.addBook = this.addBook.bind(this)
-    this.deleteBook = this.deleteBook.bind(this)
-    this.completeBook = this.completeBook.bind(this)
+    this.state = {
+      books: [],
+    };
+    this.getBooks = this.getBooks.bind(this);
+    this.getGenre = this.getGenre.bind(this);
+    this.addBook = this.addBook.bind(this);
+    this.deleteBook = this.deleteBook.bind(this);
+    this.completeBook = this.completeBook.bind(this);
+    this.updateBookshelf = this.updateBookshelf.bind(this);
   }
 
   componentDidMount() {
     this.getBooks();
   }
-  
-  getBooks = () => {
-    axios.get('/api/books')
-    .then(res => {
+
+  updateBookshelf(books) {
+    if (books)
       this.setState({
-        books: res.data
-      })
-    }).catch(err => console.log(err))
+        books: books,
+      });
+    else console.error("attempted updating with invalid book list");
   }
+
+  getBooks = () => {
+    this.updateBookshelf(getBooks());
+  };
 
   //Look at this - is this right?
   addBook = (e, title, author, genre, coverImg) => {
-    e.preventDefault()
-    axios.post('/api/books', {title, author, genre, coverImg})
-    .then(res => {
-      this.setState({
-        books: res.data
-      })
-    }).catch(err => console.log(err))
-  }
+    e.preventDefault();
+    this.updateBookshelf(addBook(title, author, genre, coverImg));
+  };
 
   getGenre = (genre) => {
-    axios.get(`/api/books/genre?genre=${genre}`)
-    .then(res => {
-      this.setState({
-        books: res.data
-      })
-    }).catch(err => console.log(err))
-  }
+    this.updateBookshelf(getGenre(genre));
+  };
 
   deleteBook = (id) => {
-    axios.delete(`/api/books/${id}`)
-    .then(res => {
-      const index = this.state.books.findIndex(book => book.id === id)
-      let booksCopy = this.state.books.slice()
-      booksCopy.splice(index, 1)
-      this.setState({
-        books: booksCopy
-      })
-    }).catch(err => console.log(err))
-  }
+    this.updateBookshelf(deleteBook(id));
+  };
 
   completeBook = (id) => {
-    axios.put(`/api/books/complete/${id}`)
-    .then(res => {
-      const index = this.state.books.findIndex(book => book.id === id)
-      let booksCopy = this.state.books.slice()
-      booksCopy[index] = res.data
-      this.setState({
-        books: booksCopy
-      })
-    }).catch(err => console.log(err))
-  }
-  
+    this.updateBookshelf(toggleComplete(id));
+  };
+
   render() {
-    console.log(this.state)
+    console.log(this.state);
     return (
-      <div className="App">
-        <div className="page">
+      <div className='App'>
+        <div className='page'>
           <Header />
-          <div className="under-header">
-            <Bookshelf 
+          <div className='under-header'>
+            <Bookshelf
               completeBook={this.completeBook}
               deleteBook={this.deleteBook}
-              books={this.state.books} />
-            <div className="right-components">
-              <GenreSelector 
+              books={this.state.books}
+            />
+            <div className='right-components'>
+              <GenreSelector
                 books={this.state.books}
-                getGenre={this.getGenre} />  
-              <AddBook 
-                addBook={this.addBook} />
-            </div>    
+                getGenre={this.getGenre}
+              />
+              <AddBook addBook={this.addBook} />
+            </div>
           </div>
-        </div>  
+        </div>
       </div>
     );
   }
@@ -103,7 +88,7 @@ class App extends React.Component {
 
 export default App;
 
-//The getGenre isn't working. 
+//The getGenre isn't working.
 
 //What's the e.preventDefault for?
 
